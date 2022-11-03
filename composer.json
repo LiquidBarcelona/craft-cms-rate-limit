@@ -1,0 +1,32 @@
+{
+  "name": "liquid/craftcms-rate-limit",
+  "description": "Rate limiting abstraction which, in conjunction with your application's cache, provides an easy way to limit requests during a specified window of time.",
+  "type": "craft-plugin",
+  "keywords": ["craft", "cms", "craft-plugin", "rate limit"],
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Marc Bernet",
+      "homepage": "https://liquidbcn.com"
+    }
+  ],
+  "support": {
+    "email": "mbernet@liquid.cat",
+    "issues": "https://github.com/LiquidBarcelona/craft-cms-rate-limit/issues?state=open",
+    "source": "https://github.com/LiquidBarcelona/craft-cms-rate-limit",
+    "docs": "https://github.com/LiquidBarcelona/craft-cms-rate-limit/blob/master/README.md"
+  },
+  "require": {
+    "craftcms/cms": "^4.2.8"
+  },
+  "autoload": {
+    "psr-4": {
+      "liquidbcn\\ratelimit\\": "src/"
+    }
+  },
+  "extra": {
+    "name": "Rate Limit",
+    "handle": "rate-limit",
+    "class": "liquidbcn\\ratelimit\\RateLimit"
+  }
+}
