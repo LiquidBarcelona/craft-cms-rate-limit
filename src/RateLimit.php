@@ -25,7 +25,7 @@ class RateLimit extends \craft\base\Plugin
         if($numHits !== false) {
             $cache->set($key, $numHits + 1, 60);
             if($numHits > $maxRequests) {
-                throw new HttpException('429');
+                throw new HttpException('429', 'Rate Limit Exceeded! Slow Down');
             }
 
         } else {
