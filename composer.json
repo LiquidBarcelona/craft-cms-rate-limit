@@ -1,5 +1,5 @@
 {
-  "name": "liquid/craftcms-rate-limit",
+  "name": "liquidbcn/craftcms-rate-limit",
   "description": "Rate limiting abstraction which, in conjunction with your application's cache, provides an easy way to limit requests during a specified window of time.",
   "type": "craft-plugin",
   "keywords": ["craft", "cms", "craft-plugin", "rate limit"],
