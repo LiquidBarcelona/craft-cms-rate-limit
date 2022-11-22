@@ -1,0 +1,23 @@
+{% extends '_layouts/cp' %}
+
+{% block content %}
+
+<div>
+    <h2>Protection to prevent DDoS attacks enabled!</h2>
+    <p>Rate Limit define a maximum number of request a user (or bot) can make to your website.</p>
+</div>
+<hr>
+<div>
+    <h2>How to set up</h2>
+    <p>By default the maximum value is set to 4000 per Ip and per minute.</p>
+    <p>You can change this value by creating your own config file in <code>/config/rate-limit.php</code>:</p>
+    <pre>
+    <code>
+    return [
+        'maxRequestsPerIpPerMinute' => 256,
+    ];
+    </code>
+    </pre>
+</div>
+
+{% endblock %}

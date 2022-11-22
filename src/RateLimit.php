@@ -46,5 +46,17 @@ class RateLimit extends \craft\base\Plugin
         return new \liquidbcn\ratelimit\models\Settings();
     }
 
+    /**
+     * @inheritdoc
+     */
+    protected function settingsHtml(): string
+    {
+        return Craft::$app->view->renderTemplate(
+            'craft-cms-rate-limit/settings',
+            [
+                'settings'  => $this->getSettings(),
+            ]
+        );
+    }
 
 }
