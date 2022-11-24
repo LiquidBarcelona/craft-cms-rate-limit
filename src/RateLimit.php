@@ -1,6 +1,7 @@
 <?php
 namespace liquidbcn\ratelimit;
 
+use Craft;
 use craft\base\Model;
 use yii\web\HttpException;
 
@@ -46,5 +47,17 @@ class RateLimit extends \craft\base\Plugin
         return new \liquidbcn\ratelimit\models\Settings();
     }
 
+    /**
+     * @inheritdoc
+     */
+    protected function settingsHtml(): string
+    {
+        return Craft::$app->view->renderTemplate(
+            'rate-limit/settings',
+            [
+                'settings'  => $this->getSettings(),
+            ]
+        );
+    }
 
 }
