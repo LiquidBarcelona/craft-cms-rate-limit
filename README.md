@@ -69,6 +69,15 @@ return [
 
 The plugin tracks requests per IP using Craft's cache system with 60-second windows. When an IP exceeds the configured limit, subsequent requests receive an HTTP 429 (Too Many Requests) response.
 
+## Dashboard
+
+Access the Rate Limit dashboard from the Control Panel sidebar to monitor blocked requests:
+
+- **Stats overview** - Blocked requests in the last hour and 24 hours
+- **Top blocked IPs** - Most frequently blocked IP addresses
+- **Recent blocked requests** - Log of the last 100 blocked requests with timestamps and URIs
+- **Check IP** - Quick link to AbuseIPDB to investigate suspicious IPs
+
 ---
 
 Brought to you by [Liquid Studio](https://liquidbcn.com)

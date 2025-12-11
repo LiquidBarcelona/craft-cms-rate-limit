@@ -1,0 +1,135 @@
+{% extends '_layouts/cp' %}
+
+{% set title = 'Rate Limit Dashboard' %}
+
+{% block content %}
+    <style>
+        .rate-limit-stats {
+            display: flex;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .rate-limit-stat {
+            flex: 1 1 0;
+            text-align: center;
+            padding: 2rem 1.5rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.25);
+            position: relative;
+            overflow: hidden;
+        }
+        .rate-limit-stat::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100px;
+            height: 100px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            transform: translate(30%, -30%);
+        }
+        .rate-limit-stat p {
+            margin: 0 0 0.5rem;
+            font-size: 2.75rem;
+            font-weight: 700;
+            line-height: 1;
+            color: #fff;
+            position: relative;
+        }
+        .rate-limit-stat h2 {
+            margin: 0;
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.85);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: relative;
+        }
+        .rate-limit-stat.stat-warning {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            box-shadow: 0 4px 15px rgba(245, 87, 108, 0.25);
+        }
+        .rate-limit-stat.stat-info {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            box-shadow: 0 4px 15px rgba(79, 172, 254, 0.25);
+        }
+    </style>
+    <div class="rate-limit-stats">
+        <div class="rate-limit-stat {{ stats.blockedLastHour > 0 ? 'stat-warning' : '' }}">
+            <p>{{ stats.blockedLastHour }}</p>
+            <h2>Blocked (Last Hour)</h2>
+        </div>
+        <div class="rate-limit-stat {{ stats.blocked24h > 0 ? 'stat-warning' : '' }}">
+            <p>{{ stats.blocked24h }}</p>
+            <h2>Blocked (24h)</h2>
+        </div>
+        <div class="rate-limit-stat stat-info">
+            <p>{{ stats.totalEntries }}</p>
+        <h2>Log Entries</h2>
+        </div>
+    </div>
+
+    {% if stats.topIps | length %}
+        <div class="pane" style="margin-bottom: 2rem;">
+            <h2 style="margin: 0 0 1rem;">Top Blocked IPs (24h)</h2>
+            <table class="data fullwidth">
+                <thead>
+                    <tr>
+                        <th>IP Address</th>
+                        <th>Blocked Requests</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ip, count in stats.topIps %}
+                        <tr>
+                            <td><code>{{ ip }}</code></td>
+                            <td>{{ count }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+
+    <div class="pane">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <h2 style="margin: 0;">Recent Blocked Requests</h2>
+            {% if entries | length %}
+                <form method="post" action="{{ actionUrl('rate-limit/dashboard/clear') }}">
+                    {{ csrfInput() }}
+                    <button type="submit" class="btn small">Clear Log</button>
+                </form>
+            {% endif %}
+        </div>
+
+        {% if entries | length %}
+            <table class="data fullwidth">
+                <thead>
+                    <tr>
+                        <th>Time</th>
+                        <th>IP Address</th>
+                        <th>URI</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for entry in entries | slice(0, 50) %}
+                        <tr>
+                            <td>{{ entry.timestamp | date('Y-m-d H:i:s') }}</td>
+                            <td><code>{{ entry.ip }}</code></td>
+                            <td><code>{{ entry.uri | truncate(60) }}</code></td>
+                            <td><a href="https://abuseipdb.com/check/{{ entry.ip }}" target="_blank" rel="noopener" class="btn small">Check IP</a></td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% if entries | length > 50 %}
+                <p style="margin: 1rem 0 0; color: #8f98a3;">Showing 50 of {{ entries | length }} entries</p>
+            {% endif %}
+        {% else %}
+            <p style="color: #8f98a3;">No blocked requests recorded yet.</p>
+        {% endif %}
+    </div>
+{% endblock %}
