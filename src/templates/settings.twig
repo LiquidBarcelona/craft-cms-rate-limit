@@ -1,26 +1,47 @@
-{% block content %}
-    <style>
-        .code {
-            padding: .75rem 1rem;
-            background: #f1f5fd;
-            border-radius: 0.25rem;
-        }
-        .code.span {
-            padding: .25rem .5rem;
-        }
-    </style>
-    <div>
-        <h2>Protection to prevent DDoS attacks enabled!</h2>
-        <p>Rate Limit define a maximum number of request a user (or bot) can make to your website.</p>
-    </div>
-    <hr>
-    <div>
-        <h2>How to set up</h2>
-        <p>By default the maximum value is set to 4000 per Ip and per minute.</p>
-        <p>You can change this value by creating your own config file in <code class="code span">/config/rate-limit.php</code>:</p>
-        <pre class="code">
-    return [
-        'maxRequestsPerIpPerMinute' => 256,
-    ];</pre>
-    </div>
-{% endblock %}
+{% import '_includes/forms.twig' as forms %}
+
+{{ forms.lightswitchField({
+    label: 'Enable Rate Limiting',
+    instructions: 'Turn rate limiting on or off globally.',
+    id: 'enabled',
+    name: 'enabled',
+    on: settings.enabled,
+}) }}
+
+{{ forms.textField({
+    label: 'Max Requests per IP per Minute',
+    instructions: 'Maximum number of requests allowed from a single IP address within a 60-second window.',
+    id: 'maxRequestsPerIpPerMinute',
+    name: 'maxRequestsPerIpPerMinute',
+    type: 'number',
+    min: 1,
+    value: settings.maxRequestsPerIpPerMinute,
+    errors: settings.getErrors('maxRequestsPerIpPerMinute'),
+}) }}
+
+{{ forms.textareaField({
+    label: 'Excluded IPs',
+    instructions: 'IP addresses that should bypass rate limiting. One IP or CIDR range per line (e.g., 192.168.1.100 or 10.0.0.0/8).',
+    id: 'excludedIps',
+    name: 'excludedIps',
+    value: settings.excludedIps | join("\n"),
+    rows: 5,
+    errors: settings.getErrors('excludedIps'),
+}) }}
+
+<hr>
+
+<div class="pane">
+    <h2>Config File Override</h2>
+    <p>Settings can also be configured via <code>config/rate-limit.php</code>. Config file values take precedence over these settings.</p>
+    <pre style="background: #f1f5fd; padding: 1rem; border-radius: 0.25rem; margin-top: 1rem;">&lt;?php
+
+return [
+    'enabled' => true,
+    'maxRequestsPerIpPerMinute' => 200,
+    'excludedIps' => [
+        '127.0.0.1',
+        '10.0.0.0/8',
+    ],
+];</pre>
+</div>

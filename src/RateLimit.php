@@ -23,9 +23,21 @@ class RateLimit extends Plugin
 
     protected function limitRequest(): void
     {
+        $settings = $this->getSettings();
+
+        if (!$settings->enabled) {
+            return;
+        }
+
+        $ip = Craft::$app->getRequest()->getUserIP();
+
+        if ($this->isIpExcluded($ip)) {
+            return;
+        }
+
         $cache = Craft::$app->getCache();
-        $key = $this->getKey();
-        $maxRequests = $this->getMaxRequestsPerMinute();
+        $key = $this->getCacheKey($ip);
+        $maxRequests = $settings->maxRequestsPerIpPerMinute;
         $numHits = $cache->get($key);
 
         if ($numHits !== false) {
@@ -39,14 +51,51 @@ class RateLimit extends Plugin
         }
     }
 
-    protected function getKey(): string
+    protected function getCacheKey(string $ip): string
     {
-        return Craft::$app->getRequest()->getUserIP() . '::' . (int) (round(time() / 60) * 60);
+        $timestamp = (int) (round(time() / 60) * 60);
+
+        return "rate-limit:{$ip}:{$timestamp}";
     }
 
-    protected function getMaxRequestsPerMinute(): int
+    protected function isIpExcluded(string $ip): bool
     {
-        return $this->getSettings()->maxRequestsPerIpPerMinute;
+        $excludedIps = $this->getSettings()->excludedIps;
+
+        foreach ($excludedIps as $excluded) {
+            $excluded = trim($excluded);
+
+            if ($excluded === '') {
+                continue;
+            }
+
+            if (str_contains($excluded, '/')) {
+                if ($this->ipMatchesCidr($ip, $excluded)) {
+                    return true;
+                }
+            } elseif ($ip === $excluded) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    protected function ipMatchesCidr(string $ip, string $cidr): bool
+    {
+        [$subnet, $bits] = explode('/', $cidr);
+        $bits = (int) $bits;
+
+        $ipLong = ip2long($ip);
+        $subnetLong = ip2long($subnet);
+
+        if ($ipLong === false || $subnetLong === false) {
+            return false;
+        }
+
+        $mask = -1 << (32 - $bits);
+
+        return ($ipLong & $mask) === ($subnetLong & $mask);
     }
 
     protected function createSettingsModel(): ?Model
