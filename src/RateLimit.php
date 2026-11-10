@@ -5,9 +5,7 @@ namespace liquidbcn\ratelimit;
 use Craft;
 use craft\base\Model;
 use craft\base\Plugin;
-use craft\events\RegisterCpNavItemsEvent;
 use craft\events\RegisterUrlRulesEvent;
-use craft\web\twig\variables\Cp;
 use craft\web\UrlManager;
 use liquidbcn\ratelimit\models\Settings;
 use liquidbcn\ratelimit\services\BlockedRequestsService;
@@ -28,7 +26,6 @@ class RateLimit extends Plugin
         ]);
 
         $this->registerCpRoutes();
-        $this->registerCpNavItems();
 
         if (!Craft::$app->getRequest()->getIsConsoleRequest()) {
             $this->limitRequest();
@@ -49,21 +46,6 @@ class RateLimit extends Plugin
                 $event->rules['rate-limit'] = 'rate-limit/dashboard/index';
                 $event->rules['rate-limit/dashboard'] = 'rate-limit/dashboard/index';
                 $event->rules['rate-limit/dashboard/clear'] = 'rate-limit/dashboard/clear';
-            }
-        );
-    }
-
-    protected function registerCpNavItems(): void
-    {
-        Event::on(
-            Cp::class,
-            Cp::EVENT_REGISTER_CP_NAV_ITEMS,
-            function (RegisterCpNavItemsEvent $event) {
-                $event->navItems[] = [
-                    'url' => 'rate-limit/dashboard',
-                    'label' => 'Rate Limit',
-                    'icon' => '@liquidbcn/ratelimit/icon.svg',
-                ];
             }
         );
     }
